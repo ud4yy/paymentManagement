@@ -1,4 +1,17 @@
 const express = require('express');
+const validateToken = require('../middleware/validateTokenHandler');
+const { createController } = require('../controllers/controllerFactory');
+
+const router = express.Router();
+const paymentController = createController('payment');
+
+router.post('/', validateToken, paymentController.createPayment);
+router.get('/', validateToken, paymentController.getPayments);
+router.get('/:id', validateToken, paymentController.getPaymentById);
+
+module.exports = router;
+
+
 /**
  * @swagger
  * tags:
@@ -35,7 +48,6 @@ const express = require('express');
  *       500:
  *         description: Internal server error
  */
-
 /**
  * @swagger
  * /api/payment:
@@ -44,6 +56,21 @@ const express = require('express');
  *     tags: [Payment]
  *     security:
  *       - bearerAuth: [] 
+ *     parameters:
+ *       - in: query
+ *         name: from
+ *         schema:
+ *           type: string
+ *           format: YYYY-MM-DD
+ *         required: false
+ *         description: Start date for filtering payments
+ *       - in: query
+ *         name: to
+ *         schema:
+ *           type: string
+ *           format: YYYY-MM-DD
+ *         required: false
+ *         description: End date for filtering payments
  *     responses:
  *       200:
  *         description: A list of payments
@@ -74,15 +101,5 @@ const express = require('express');
  *       500:
  *         description: Internal server error
  */
-
-const router = express.Router();
-const paymentController = require('../controllers/paymentController');
-const validateToken = require('../middleware/validateTokenHandler');
-
-router.post('/',validateToken, paymentController.createPayment);
-router.get('/',validateToken, paymentController.getPayments);
-router.get('/:id',validateToken, paymentController.getPaymentById);
-
-module.exports = router;
 
 

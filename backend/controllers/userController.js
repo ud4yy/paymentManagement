@@ -1,123 +1,56 @@
-const asyncHandler =  require("express-async-handler");
-const User = require("../models/User");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
 
-const register = asyncHandler(async (req, res) => {
-    console.log("Register endpoint hit");
-
-    const { email, fullname, username, password } = req.body;
-
-    if (!email || !fullname || !username || !password) {
-        return res.status(400).json("All fields are mandatory!");
+class UserController {
+    constructor(userService) {
+        this.userService = userService;
     }
 
-    const userAvailable = await User.findOne({ username });
-    if (userAvailable) {
-        return res.status(400).json("All fields are mandatory!");
-    }
+    register = asyncHandler(async (req, res) => {
+        console.log("Register endpoint hit");
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log("Hashed Password: ", hashedPassword);
-    
-    const user = await User.create({
-        username,
-        email,
-        fullname,
-        password: hashedPassword,
+        const { email, fullname, username, password } = req.body;
+        if (!email || !fullname || !username || !password) {
+            return res.status(400).json("All fields are mandatory!");
+        }
+
+        const user = await this.userService.register({ email, fullname, username, password });
+        res.status(201).json({ _id: user.id, email: user.email });
     });
 
-    console.log(`User created ${user}`);
-    
-    if (user) {
-        return res.status(201).json({ _id: user.id, email: user.email });
-    } else {
-        res.status(400);
-        throw new Error("User data is not valid");
-    }
-});
+    login = asyncHandler(async (req, res) => {
+        console.log("Login endpoint hit");
 
-const login = asyncHandler(async (req, res) => {
-    console.log("Login endpoint hit");
+        const { username, password } = req.body;
+        if (!username || !password) {
+            return res.status(400).json("All fields are mandatory!");
+        }
 
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json("All fields are mandatory!");
-    }
-
-    const user = await User.findOne({ username });
-
-    if (user && (await bcrypt.compare(password, user.password))) {
-
-        const accessToken = jwt.sign(
-            {
-                user: {
-                    username: user.username,
-                    email: user.email,
-                    id: user.id,
-                },
-            },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "1d" } 
-        );
-
-        const refreshToken = jwt.sign(
-            {
-                user: {
-                    username: user.username,
-                    email: user.email,
-                    id: user.id,
-                },
-            },
-            process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: "7d" } 
-        );
+        const { accessToken, refreshToken } = await this.userService.login({ username, password });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production", 
+            secure: process.env.NODE_ENV === "production",
             sameSite: "Strict",
-            maxAge: 7 * 24 * 60 * 60 * 1000, 
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
-        res.status(200).json({ accessToken , refreshToken});
-    } else {
-        res.status(401);
-        throw new Error("Username or password is incorrect");
-    }
-});
+        res.status(200).json({ accessToken, refreshToken });
+    });
 
+    current = asyncHandler(async (req, res) => {
+        res.json(this.userService.getCurrentUser(req.user));
+    });
 
-const current = asyncHandler(async(req, res) => {
-    res.json(req.user);
-});
+    refreshToken = asyncHandler(async (req, res) => {
+        const refreshToken = req.cookies.refreshToken;
 
-const refreshToken = asyncHandler(async (req, res) => {
-    const refreshToken = req.cookies.refreshToken;
-
-    if (!refreshToken) {
-        return res.status(401).json("Refresh Token is required");
-    }
-
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(403).json("Invalid or expired refresh token");
+        if (!refreshToken) {
+            return res.status(401).json("Refresh Token is required");
         }
-        const accessToken = jwt.sign(
-            {
-                user: {
-                    username: decoded.user.username,
-                    email: decoded.user.email,
-                    id: decoded.user.id,
-                },
-            },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "1d" }
-        );
+
+        const accessToken = await this.userService.refreshToken(refreshToken);
         res.status(200).json({ accessToken });
     });
-});
+}
 
-
-module.exports = { refreshToken,current,register, login };
+module.exports = UserController;
