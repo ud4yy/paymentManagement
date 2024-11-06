@@ -79,7 +79,8 @@ backend/
 ## Demo Steps
 
 You can access the API documentation at [Swagger UI](https://paymentmanagement-j9mk.onrender.com/api-docs/).
-
+### Demo Image
+<img src="https://drive.google.com/uc?id=19tmPDuyKFS1BuSXXptQD3AQl09AA1w7t" alt="Demo Diagram" />
 1. **Register a User**  
    Go to the Swagger UI, navigate to the `POST /api/register` endpoint, and enter the required user details.
 
@@ -98,5 +99,5 @@ You can access the API documentation at [Swagger UI](https://paymentmanagement-j
 6. **Get Payment by ID**  
    Access a specific payment with the `GET /api/payment/{id}` endpoint.
 
-### Demo Image
-![Demo Diagram](https://drive.google.com/file/d/19tmPDuyKFS1BuSXXptQD3AQl09AA1w7t/view?usp=sharing)
+
+
