@@ -14,6 +14,8 @@ This is a comprehensive backend API for managing payment transactions, built wit
 - **API Testing**: Postman
 - **Source Control**: GitHub
 
+> **Note**: This application uses Render's free hosting service, and as per Render's policy, it may spin down due to inactivity, due to which new requests after a while may be delayed 
+
 ## Features
 
 - **User Authentication**: Secure login and registration using JWT.
