@@ -52,6 +52,9 @@ All API endpoints can be interacted with using the [Swagger UI](https://paymentm
 4. **Refresh Token** - Refresh access token  
    **POST**: [`/api/refresh-token`](https://paymentmanagement-j9mk.onrender.com/api/refresh-token)
 
+### DataBase Design
+<img src="https://drive.google.com/uc?id=1yQyJEJ0PDQ9ejV4_uHgpA5eCxG1X7nmQ" alt="DB Diagram" />
+
 ### Payment APIs
 
 1. **Create Payment** - Create a new payment  
