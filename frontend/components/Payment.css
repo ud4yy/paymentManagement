@@ -1,0 +1,28 @@
+/* Payment form styles */
+.payment-form {
+    display: flex;
+    flex-direction: column; /* Stacks elements vertically */
+    gap: 1rem; /* Adds spacing between form fields */
+    max-width: 400px; /* Optional: Restrict form width */
+    margin: 0 auto; /* Centers the form horizontally */
+  }
+  
+  .payment-form input,
+  .payment-form button {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .payment-form button {
+    background-color: #000000;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .payment-form button:hover {
+    background-color: #0056b3;
+  }
+  
